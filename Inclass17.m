@@ -6,30 +6,26 @@
 img1=imread('img1.tif');
 img2=imread('img2.tif');
 
-diffs=zeros(1,799);
+diffs=zeros(799);
 
-for ov=1:799
-    pix1=img1(:,(end-ov):end);
-    pix2=img2(:,1:(ov+1));
-    diffs(ov)=sum(sum(abs(pix1-pix2)))/ov;
+for c=1:799
+    for r=1:799
+    pix1=img1((800-r):800,(800-c):800);
+    pix2=img2(1:(1+r),1:(1+c));
+    corr(r,c)=mean2((pix1-mean2(pix1)).*(pix2-mean2(pix2)));
+    end
 end
-figure;plot(diffs);
+[max_c,r]=max(corr);
+[max_r,c]=max(max_c);
+pos=[r(c),c];
 
-diffs2=zeros(799,1);
+rows=r(c);
+cols=c;
 
-for ov=1:799
-    pix1=img1((end-ov):end,:);
-    pix2=img2(1:ov+1,:);
-    diffs2(ov)=sum(sum(abs(pix1-pix2)))/ov;
-end
-figure;plot(diffs2);
-
-[~,overlap2]=min(diffs2);
-
-[~,overlap]=min(diffs);
-img22=img2;
-img22(1:800-overlap2, 1:800-overlap)=0;
-imshowpair(img1,img22);
+imgshift=zeros(size(img2)+[800-rows,800-cols]);
+imgshift((end-800)+1:end,(end-800)+1:end)=img2;
+figure;
+imshowpair(img1,imgshift);
 
 %fourier space
 img1=imread('img1.tif');
